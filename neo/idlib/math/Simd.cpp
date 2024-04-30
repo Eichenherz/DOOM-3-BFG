@@ -123,46 +123,45 @@ void idSIMD::Shutdown() {
 
 idSIMDProcessor *p_simd;
 idSIMDProcessor *p_generic;
-long baseClocks = 0;
+int64 baseClocks = 0;
 
+#if defined(_MSC_VER) && defined(_M_X64)
+#define TIME_TYPE int64
 
-#define TIME_TYPE int
+#include <intrin.h>
+
+int64 CoherentRdtsc()
+{
+	int cpui[4];
+	__cpuid( cpui, 0 );
+	int64 rdtsc = (int64)__rdtsc();
+	__cpuid( cpui, 0 );
+	return rdtsc;
+}
 
 #pragma warning(disable : 4731)     // frame pointer register 'ebx' modified by inline assembly code
 
-long saved_ebx = 0;
-
 #define StartRecordTime( start )			\
-	__asm mov saved_ebx, ebx				\
-	__asm xor eax, eax						\
-	__asm cpuid								\
-	__asm rdtsc								\
-	__asm mov start, eax					\
-	__asm xor eax, eax						\
-	__asm cpuid
+	start = CoherentRdtsc()
 
 #define StopRecordTime( end )				\
-	__asm xor eax, eax						\
-	__asm cpuid								\
-	__asm rdtsc								\
-	__asm mov end, eax						\
-	__asm mov ebx, saved_ebx				\
-	__asm xor eax, eax						\
-	__asm cpuid
+	end = CoherentRdtsc()
 
 
 #define GetBest( start, end, best )			\
 	if ( !best || end - start < best ) {	\
 		best = end - start;					\
 	}
-
+#else
+      #error Architecture not supported
+#endif
 
 /*
 ============
 PrintClocks
 ============
 */
-void PrintClocks( char *string, int dataCount, int clocks, int otherClocks = 0 ) {
+void PrintClocks( const char *string, int dataCount, int clocks, int otherClocks = 0 ) {
 	int i;
 
 	idLib::common->Printf( string );
@@ -185,10 +184,10 @@ GetBaseClocks
 ============
 */
 void GetBaseClocks() {
-	int i, start, end, bestClocks;
+	int start, end;
 
-	bestClocks = 0;
-	for ( i = 0; i < NUMTESTS; i++ ) {
+	int bestClocks = 0;
+	for ( int i = 0; i < NUMTESTS; ++i ) {
 		StartRecordTime( start );
 		StopRecordTime( end );
 		GetBest( start, end, bestClocks );

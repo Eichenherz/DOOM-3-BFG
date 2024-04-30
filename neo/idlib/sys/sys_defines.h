@@ -2,9 +2,10 @@
 ===========================================================================
 
 Doom 3 BFG Edition GPL Source Code
-Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
+Copyright (C) 2012 Robert Beckebans
 
-This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").  
+This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
 Doom 3 BFG Edition Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,73 +32,39 @@ If you have questions concerning this license or the applicable additional terms
 /*
 ================================================================================================
 
-	Platform Specific ID_ Defines
-
-	The ID_ defines are the only platform defines we should be using.
+	Non-portable system services.
 
 ================================================================================================
 */
 
-#undef ID_PC
-#undef ID_PC_WIN
-#undef ID_PC_WIN64
-#undef ID_CONSOLE
-#undef ID_WIN32
-#undef ID_LITTLE_ENDIAN
+// Win32
+#if defined(WIN32) || defined(_WIN32)
 
-#if defined(_WIN32)
-	// _WIN32 always defined
-	// _WIN64 also defined for x64 target
-/*
-	#if !defined( _MANAGED )
-		#if !defined( _WIN64 )
-			#define ID_WIN_X86_ASM
-			#define ID_WIN_X86_MMX_ASM
-			#define ID_WIN_X86_MMX_INTRIN
-			#define ID_WIN_X86_SSE_ASM
-			#define ID_WIN_X86_SSE_INTRIN
-			#define ID_WIN_X86_SSE2_ASM
-			#define ID_WIN_X86_SSE2_INTRIN
-			// the 32 bit build is now as close to the console builds as possible
-			#define ID_CONSOLE
-		#else
-			#define ID_PC_WIN64
-			#define ID_WIN_X86_MMX_INTRIN
-			#define ID_WIN_X86_SSE_INTRIN
-			#define ID_WIN_X86_SSE2_INTRIN
-			#define ID_WIN_X86_SSE3_INTRIN
-		#endif
-	#endif
-*/
 
-	#define ID_PC
-	#define ID_PC_WIN
-	#define ID_WIN32
-	#define ID_LITTLE_ENDIAN
+#if defined(_WIN64)
+#define	CPUSTRING						"x64"
+#elif defined(__aarch64__) || defined(__ARM64__) || defined(_M_ARM64)
+#define CPUSTRING 						"arm64"
 #else
-#error Unknown Platform
+#define	CPUSTRING						"x86"
 #endif
 
-#define ID_OPENGL
-
-/*
-================================================================================================
-
-	PC Windows
-
-================================================================================================
-*/
-
-#ifdef ID_PC_WIN
-
-#define	CPUSTRING						"x86"
-
 #define	BUILD_STRING					"win-" CPUSTRING
-#define BUILD_OS_ID						0
 
+#ifdef _MSC_VER
 #define ALIGN16( x )					__declspec(align(16)) x
 #define ALIGNTYPE16						__declspec(align(16))
 #define ALIGNTYPE128					__declspec(align(128))
+#else
+	// DG: mingw/GCC (and probably clang) support
+#define ALIGN16( x )					x __attribute__ ((aligned (16)))
+// FIXME: change ALIGNTYPE* ?
+#define ALIGNTYPE16
+#define ALIGNTYPE128
+// DG end
+#endif
+
+
 #define FORMAT_PRINTF( x )
 
 #define PATHSEPARATOR_STR				"\\"
@@ -105,8 +72,13 @@ If you have questions concerning this license or the applicable additional terms
 #define NEWLINE							"\r\n"
 
 #define ID_INLINE						inline
+#ifdef _MSC_VER
 #define ID_FORCE_INLINE					__forceinline
-
+#else
+	// DG: this should at least work with GCC/MinGW, probably with clang as well..
+#define ID_FORCE_INLINE					inline // TODO: always_inline?
+// DG end
+#endif
 // lint complains that extern used with definition is a hazard, but it
 // has the benefit (?) of making it illegal to take the address of the function
 #ifdef _lint
@@ -114,15 +86,30 @@ If you have questions concerning this license or the applicable additional terms
 #define ID_FORCE_INLINE_EXTERN			__forceinline
 #else
 #define ID_INLINE_EXTERN				extern inline
+#ifdef _MSC_VER
 #define ID_FORCE_INLINE_EXTERN			extern __forceinline
+#else
+	// DG: GCC/MinGW, probably clang
+#define ID_FORCE_INLINE_EXTERN			extern inline // TODO: always_inline ?
+// DG end
 #endif
+#endif
+
+// DG: #pragma hdrstop is only available on MSVC, so make sure it doesn't cause compiler warnings on other compilers..
+#ifdef _MSC_VER
+	// afaik __pragma is a MSVC specific alternative to #pragma that can be used in macros
+#define ID_HDRSTOP __pragma(hdrstop)
+#else
+#define ID_HDRSTOP
+#endif // DG end
 
 // we should never rely on this define in our code. this is here so dodgy external libraries don't get confused
 #ifndef WIN32
-	#define WIN32
+#define WIN32
 #endif
 
 #endif
+// RB end
 
 /*
 ================================================================================================
@@ -134,8 +121,14 @@ Defines and macros usable in all code
 
 #define ALIGN( x, a ) ( ( ( x ) + ((a)-1) ) & ~((a)-1) )
 
-#define _alloca16( x )					((void *)ALIGN( (UINT_PTR)_alloca( ALIGN( x, 16 ) + 16 ), 16 ) )
-#define _alloca128( x )					((void *)ALIGN( (UINT_PTR)_alloca( ALIGN( x, 128 ) + 128 ), 128 ) )
+
+// RB: changed UINT_PTR to uintptr_t
+#if !defined(__APPLE__)
+#include <malloc.h>
+#endif
+#define _alloca16( x )					((void *)ALIGN( (uintptr_t)_alloca( ALIGN( x, 16 ) + 16 ), 16 ) )
+#define _alloca128( x )					((void *)ALIGN( (uintptr_t)_alloca( ALIGN( x, 128 ) + 128 ), 128 ) )
+// RB end
 
 #define likely( x )	( x )
 #define unlikely( x )	( x )
@@ -163,8 +156,7 @@ bulk of the codebase, so it is the best place for analyze pragmas.
 ================================================================================================
 */
 
-#if defined( ID_WIN32 )
-
+#ifdef _MSC_VER
 // disable some /analyze warnings here
 #pragma warning( disable: 6255 )	// warning C6255: _alloca indicates failure by raising a stack overflow exception. Consider using _malloca instead. (Note: _malloca requires _freea.)
 #pragma warning( disable: 6262 )	// warning C6262: Function uses '36924' bytes of stack: exceeds /analyze:stacksize'32768'. Consider moving some data to heap
@@ -181,18 +173,40 @@ bulk of the codebase, so it is the best place for analyze pragmas.
 // win32 needs this, but 360 doesn't
 #pragma warning( disable: 6540 )	// warning C6540: The use of attribute annotations on this function will invalidate all of its existing __declspec annotations [D:\tech5\engine\engine-10.vcxproj]
 
+#pragma warning( disable: 4467 )	// .. Include\CodeAnalysis\SourceAnnotations.h(68): warning C4467: usage of ATL attributes is deprecated
 
-// checking format strings catches a LOT of errors
-#include <CodeAnalysis\SourceAnnotations.h>
-#define	VERIFY_FORMAT_STRING	[SA_FormatString(Style="printf")]
+#if !defined(VERIFY_FORMAT_STRING)
+	// checking format strings catches a LOT of errors
+#define	VERIFY_FORMAT_STRING	_Printf_format_string_
+// DG: alternative for GCC with attribute (NOOP for MSVC)
+#define ID_STATIC_ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX)
+#endif
 
+#else
+#define	VERIFY_FORMAT_STRING
+// STRIDX: index of format string in function arguments (first arg == 1)
+// FIRSTARGIDX: index of first argument for the format string
+#define ID_STATIC_ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX) __attribute__ ((format (printf, STRIDX, FIRSTARGIDX)))
+// DG end
+#endif // _MSC_VER
+
+// This needs to be handled so shift by 1
+#define ID_INSTANCE_ATTRIBUTE_PRINTF(STRIDX, FIRSTARGIDX) ID_STATIC_ATTRIBUTE_PRINTF((STRIDX+1),(FIRSTARGIDX+1))
 
 // We need to inform the compiler that Error() and FatalError() will
 // never return, so any conditions that leeds to them being called are
 // guaranteed to be false in the following code
-#define NO_RETURN __declspec(noreturn)
 
+// RB begin
+#if defined(_MSC_VER)
+#define NO_RETURN __declspec(noreturn)
+#elif defined(__GNUC__)
+#define NO_RETURN __attribute__((noreturn))
+#else
+#define NO_RETURN
 #endif
+// RB end
+
 
 // I don't want to disable "warning C6031: Return value ignored" from /analyze
 // but there are several cases with sprintf where we pre-initialized the variables
@@ -210,3 +224,22 @@ extern volatile int ignoredReturnValue;
 #define MIN_UNSIGNED_TYPE( x )	0
 
 #endif
+
+
+/*
+ * Macros for format conversion specifications for integer arguments of type
+ * size_t or ssize_t.
+ */
+#ifdef _MSV_VER
+
+#define PRIiSIZE "Ii"
+#define PRIuSIZE "Iu"
+#define PRIxSIZE "Ix"
+
+#else // ifdef _MSV_VER
+
+#define PRIiSIZE "zi"
+#define PRIuSIZE "zu"
+#define PRIxSIZE "zx"
+
+#endif // ifdef _MSV_VER
