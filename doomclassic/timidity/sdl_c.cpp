@@ -38,7 +38,7 @@ Minimal control mode -- no interaction, just stores messages.
 static void ctl_refresh(void);
 static void ctl_total_time(int tt);
 static void ctl_master_volume(int mv);
-static void ctl_file_name(char *name);
+static void ctl_file_name(const char *name);
 static void ctl_current_time(int ct);
 static void ctl_note(int v);
 static void ctl_program(int ch, int val);
@@ -51,7 +51,7 @@ static void ctl_reset(void);
 static int ctl_open(int using_stdin, int using_stdout);
 static void ctl_close(void);
 static int ctl_read(int *valp);
-static int cmsg(int type, int verbosity_level, char *fmt, ...);
+static int cmsg(int type, int verbosity_level, const char *fmt, ...);
 
 #ifdef _DEBUG
 #define safeOutputDebug(x) printf( "%s", x )
@@ -92,7 +92,7 @@ static int ctl_read(int *valp)
 }
 extern void SendDebugMsg(const char*);
 extern bool debugOutput;
-static int cmsg(int type, int verbosity_level, char *fmt, ...)
+static int cmsg(int type, int verbosity_level, const char *fmt, ...)
 {
 #ifdef _DEBUG
 	va_list ap;
@@ -117,7 +117,7 @@ static void ctl_total_time(int tt) {}
 
 static void ctl_master_volume(int mv) {}
 
-static void ctl_file_name(char *name) {}
+static void ctl_file_name(const char *name) {}
 
 static void ctl_current_time(int ct) {}
 
