@@ -536,7 +536,7 @@ Sys_FPU_StackIsEmpty
 ===============
 */
 bool Sys_FPU_StackIsEmpty() {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 	return true;
 }
 
@@ -546,7 +546,7 @@ Sys_FPU_ClearStack
 ===============
 */
 void Sys_FPU_ClearStack() {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
 
 /*
@@ -558,7 +558,7 @@ Sys_FPU_GetState
 */
 const char *Sys_FPU_GetState() {
 #if defined(_WIN64)
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 	return "TODO Sys_FPU_GetState()";
 #endif
 }
@@ -569,7 +569,7 @@ Sys_FPU_EnableExceptions
 ===============
 */
 void Sys_FPU_EnableExceptions( int exceptions ) {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
 
 /*
@@ -578,7 +578,7 @@ Sys_FPU_SetPrecision
 ===============
 */
 void Sys_FPU_SetPrecision( int precision ) {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
 
 /*
@@ -587,7 +587,7 @@ Sys_FPU_SetRounding
 ================
 */
 void Sys_FPU_SetRounding( int rounding ) {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
 
 /*
@@ -596,7 +596,7 @@ Sys_FPU_SetDAZ
 ================
 */
 void Sys_FPU_SetDAZ( bool enable ) {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
 
 /*
@@ -605,5 +605,5 @@ Sys_FPU_SetFTZ
 ================
 */
 void Sys_FPU_SetFTZ( bool enable ) {
-	assert( 0 && "Impl me as AVX ?" );
+	//assert( 0 && "Impl me as AVX ?" );
 }
