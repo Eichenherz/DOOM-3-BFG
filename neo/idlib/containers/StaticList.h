@@ -539,8 +539,7 @@ Note that the element is not destroyed, so any memory used by it may not be free
 */
 template<class type,int size>
 ID_INLINE bool idStaticList<type,size>::RemoveIndex( int index ) {
-	int i;
-
+	
 	assert( index >= 0 );
 	assert( index < num );
 
@@ -548,9 +547,9 @@ ID_INLINE bool idStaticList<type,size>::RemoveIndex( int index ) {
 		return false;
 	}
 
-	num--;
-	for( i = index; i < num; i++ ) {
-		list[ i ] = list[ i + 1 ];
+	--num;
+	for( int i = index; i < num; ++i ) {
+		list[ i ] = std::move( list[ i + 1 ] );
 	}
 
 	return true;

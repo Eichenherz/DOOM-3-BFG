@@ -153,14 +153,14 @@ enum sys_jEvents {
 	J_ACTION_MAX = J_ACTION32,
 
 	J_AXIS_MIN,
-	J_AXIS_LEFT_X = J_AXIS_MIN + AXIS_LEFT_X,
-	J_AXIS_LEFT_Y = J_AXIS_MIN + AXIS_LEFT_Y,
-	J_AXIS_RIGHT_X = J_AXIS_MIN + AXIS_RIGHT_X,
-	J_AXIS_RIGHT_Y = J_AXIS_MIN + AXIS_RIGHT_Y,
-	J_AXIS_LEFT_TRIG = J_AXIS_MIN + AXIS_LEFT_TRIG,
-	J_AXIS_RIGHT_TRIG = J_AXIS_MIN + AXIS_RIGHT_TRIG,
+	J_AXIS_LEFT_X = ( int ) J_AXIS_MIN + ( int ) AXIS_LEFT_X,
+	J_AXIS_LEFT_Y = ( int ) J_AXIS_MIN + ( int ) AXIS_LEFT_Y,
+	J_AXIS_RIGHT_X = ( int ) J_AXIS_MIN + ( int ) AXIS_RIGHT_X,
+	J_AXIS_RIGHT_Y = ( int ) J_AXIS_MIN + ( int ) AXIS_RIGHT_Y,
+	J_AXIS_LEFT_TRIG = ( int ) J_AXIS_MIN + ( int ) AXIS_LEFT_TRIG,
+	J_AXIS_RIGHT_TRIG = ( int ) J_AXIS_MIN + ( int ) AXIS_RIGHT_TRIG,
 
-	J_AXIS_MAX = J_AXIS_MIN + MAX_JOYSTICK_AXIS - 1,
+	J_AXIS_MAX = ( int ) J_AXIS_MIN + ( int ) MAX_JOYSTICK_AXIS - 1,
 
 	J_DPAD_UP,
 	J_DPAD_DOWN,
@@ -483,15 +483,8 @@ bool			Sys_UnlockMemory( void *ptr, int bytes );
 // set amount of physical work memory
 void			Sys_SetPhysicalWorkMemory( int minBytes, int maxBytes );
 
-// allows retrieving the call stack at execution points
-void			Sys_GetCallStack( address_t *callStack, const int callStackSize );
-const char *	Sys_GetCallStackStr( const address_t *callStack, const int callStackSize );
-const char *	Sys_GetCallStackCurStr( int depth );
-const char *	Sys_GetCallStackCurAddressStr( int depth );
-void			Sys_ShutdownSymbols();
-
 // DLL loading, the path should be a fully qualified OS path to the DLL file to be loaded
-int				Sys_DLL_Load( const char *dllName );
+intptr_t		Sys_DLL_Load( const char *dllName );
 void *			Sys_DLL_GetProcAddress( int dllHandle, const char *procName );
 void			Sys_DLL_Unload( int dllHandle );
 
@@ -699,11 +692,6 @@ public:
 
 	virtual bool			LockMemory( void *ptr, int bytes ) = 0;
 	virtual bool			UnlockMemory( void *ptr, int bytes ) = 0;
-
-	virtual void			GetCallStack( address_t *callStack, const int callStackSize ) = 0;
-	virtual const char *	GetCallStackStr( const address_t *callStack, const int callStackSize ) = 0;
-	virtual const char *	GetCallStackCurStr( int depth ) = 0;
-	virtual void			ShutdownSymbols() = 0;
 
 	virtual int				DLL_Load( const char *dllName ) = 0;
 	virtual void *			DLL_GetProcAddress( int dllHandle, const char *procName ) = 0;

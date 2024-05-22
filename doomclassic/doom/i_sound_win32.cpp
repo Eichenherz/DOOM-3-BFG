@@ -151,7 +151,7 @@ getsfx
 // This function loads the sound data from the WAD lump,
 //  for single sound.
 //
-void* getsfx ( char* sfxname, int* len )
+void* getsfx ( const char* sfxname, int* len )
 {
 	unsigned char*      sfx;
 	unsigned char*	    sfxmem;
@@ -813,7 +813,7 @@ void I_InitMusic(void)
 		voiceFormat.wBitsPerSample = MIDI_FORMAT_BYTES * 8;
 		voiceFormat.cbSize = 0;
 
-		soundSystemLocal.hardware.GetIXAudio2()->CreateSourceVoice( &pMusicSourceVoice, (WAVEFORMATEX *)&voiceFormat, XAUDIO2_VOICE_MUSIC );
+		soundSystemLocal.hardware.GetIXAudio2()->CreateSourceVoice( &pMusicSourceVoice, (WAVEFORMATEX *)&voiceFormat );
 
 		Music_initialized = true;
 	}

@@ -67,7 +67,7 @@ public:
 	void 							SetDef( const leaderboardDefinition_t * def_ ) { def = def_; }
 	void 							SetStartIndex( int startIndex_ ) { startIndex = startIndex_; }
 	void 							SetLocalIndex( int localIndex_ ) { localIndex = localIndex_; }
-	void							SetErrorCode( leaderboardError_t errorCode ) { this->errorCode = errorCode; }
+	void							SetErrorCode( leaderboardError_t errCode ) { this->errorCode = errCode; }
 
 	// Used in user callback for information retrieval
 	const leaderboardDefinition_t *	GetDef() const { return def; }

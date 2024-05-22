@@ -525,7 +525,7 @@ idCommonDialog::HasDialogMsg
 */
 bool idCommonDialog::HasDialogMsg( gameDialogMessages_t msg, bool * isNowActive ) {
 	for ( int index = 0; index < messageList.Num(); ++index ) {
-		idDialogInfo & info = messageList[index];
+		const idDialogInfo & info = messageList[index];
 
 		if ( info.msg == msg && !info.clear ) {
 			if ( isNowActive != NULL ) {

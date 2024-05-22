@@ -123,7 +123,7 @@ int				wipestart;
 qboolean			wipedone;
 int             demosequence;
 int             pagetic;
-char                    *pagename;
+const char      *pagename;
 char            title[128];
 // d_main.vars end // 
 //  d_net.vars begin // 
@@ -267,7 +267,7 @@ skill_t	d_skill;
 int     d_episode; 
 int     d_map; 
 int		d_mission;
-char*	defdemoname; 
+const char*	defdemoname; 
 // g_game.vars end // 
 //  hu_lib.vars begin // 
 qboolean	lastautomapactive ;
@@ -335,7 +335,7 @@ int			screenblocks;		// has default
 int			screenSize;		
 int			quickSaveSlot;          
 int			messageToPrint;
-char*			messageString;		
+const char*			messageString;		
 int			messx;			
 int			messy;
 int			messageLastMenuActive;

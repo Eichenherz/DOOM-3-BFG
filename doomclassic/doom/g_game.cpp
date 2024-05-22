@@ -1382,7 +1382,7 @@ void G_DoWorldDone (void)
 void R_ExecuteSetViewSize (void);
 
 
-void G_LoadGame (char* name) 
+void G_LoadGame (const char* name) 
 { 
 	strcpy (::g->savename, name); 
 	::g->gameaction = ga_loadgame; 
@@ -1779,7 +1779,7 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
 //
 // G_RecordDemo 
 // 
-void G_RecordDemo (char* name) 
+void G_RecordDemo (const char* name) 
 { 
 	//::g->usergame = false; 
 	strcpy( ::g->demoname, name ); 
@@ -1844,7 +1844,7 @@ void G_BeginRecording (void)
 //
 // G_PlayDemo 
 //
-void G_DeferedPlayDemo (char* name) 
+void G_DeferedPlayDemo (const char* name) 
 { 
 	::g->defdemoname = name; 
 	::g->gameaction = ga_playdemo; 
@@ -1946,7 +1946,7 @@ void G_DoPlayDemo (void)
 //
 // G_TimeDemo 
 //
-void G_TimeDemo (char* name) 
+void G_TimeDemo (const char* name) 
 { 	 
 	::g->nodrawers = M_CheckParm ("-nodraw"); 
 	::g->noblit = M_CheckParm ("-noblit"); 

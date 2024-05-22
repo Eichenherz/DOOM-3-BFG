@@ -59,7 +59,13 @@ idCVar Win32Vars_t::win_viewlog( "win_viewlog", "0", CVAR_SYSTEM | CVAR_INTEGER,
 idCVar Win32Vars_t::win_timerUpdate( "win_timerUpdate", "0", CVAR_SYSTEM | CVAR_BOOL, "allows the game to be updated while dragging the window" );
 idCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "0", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
 
+idCVar Win32Vars_t::sys_useSteamPath( "sys_useSteamPath", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Look for Steam Doom 3 BFG path instead of local installation" );
+idCVar Win32Vars_t::sys_useGOGPath( "sys_useGOGPath", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Look for GOG Doom 3 BFG path instead of local installation" );
+
+
 Win32Vars_t	win32;
+
+static idStr	basepath;
 
 static char		sys_cmdline[MAX_STRING_CHARS];
 
@@ -501,10 +507,165 @@ const char *Sys_Cwd() {
 
 /*
 ==============
+Sys_SteamBasePath
+==============
+*/
+static char steamPathBuffer[ MAX_OSPATH ] = { 0 };
+
+static const char* Sys_SteamBasePath()
+{
+#if defined(STEAMPATH_NAME) || defined(STEAMPATH_APPID)
+	WCHAR wideBuffer[ MAX_OSPATH ] = { 0 };
+	HKEY steamRegKey;
+	DWORD steamRegKeyLen = MAX_OSPATH;
+
+	// Let's try the Steam appid path first
+#ifdef STEAMPATH_APPID
+	if( !RegOpenKeyExW( HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App " STEAMPATH_APPID, 0, KEY_QUERY_VALUE, &steamRegKey ) )
+	{
+		if( !RegQueryValueExW( steamRegKey, L"InstallLocation", NULL, NULL, ( LPBYTE ) wideBuffer, &steamRegKeyLen ) )
+		{
+			// Convert our path from widechar to asci
+			if( WidePath2ASCI( steamPathBuffer, steamRegKeyLen, wideBuffer ) )
+			{
+				if( Sys_IsFolder( steamPathBuffer ) == FOLDER_YES )
+				{
+					common->Printf( "^4Using Steam app id base path '%s'\n", steamPathBuffer );
+					return steamPathBuffer;
+				}
+			}
+		}
+
+		RegCloseKey( steamRegKey );
+	}
+#endif
+
+	// Let's try the Steam install path next (this only works if the user has the default steamlibrary set to match the install path)
+#ifdef STEAMPATH_NAME
+	if( !RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Steam", 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steamRegKey ) )
+	{
+		steamRegKeyLen = MAX_OSPATH; // reset steamRegKeyLen to MAX_OSPATH from above
+		if( !RegQueryValueEx( steamRegKey, "SteamPath", NULL, NULL, ( LPBYTE ) wideBuffer, &steamRegKeyLen ) )
+		{
+			if( !RegQueryValueEx( steamRegKey, "InstallPath", NULL, NULL, ( LPBYTE ) wideBuffer, &steamRegKeyLen ) )
+			{
+				// Convert our path from widechar to asci
+				if( WidePath2ASCI( steamPathBuffer, steamRegKeyLen, wideBuffer ) )
+				{
+					idStr steamInstallPath;
+					steamInstallPath = steamPathBuffer;
+					steamInstallPath.AppendPath( "steamapps\\common\\" STEAMPATH_NAME );
+					if( Sys_IsFolder( steamInstallPath.c_str() ) == FOLDER_YES )
+					{
+						common->Printf( "^4Using Steam install base path '%s'\n", steamInstallPath.c_str() );
+						return steamInstallPath.c_str();
+					}
+				}
+			}
+		}
+	}
+#endif
+#endif
+
+	return steamPathBuffer;
+}
+
+/*
+================
+Sys_GogBasePath
+================
+*/
+static char gogPathBuffer[ MAX_OSPATH ] = { 0 };
+
+static const char* Sys_GogBasePath()
+{
+#ifdef GOGPATH_ID
+	HKEY gogRegKey;
+	DWORD gogRegKeyLen = MAX_OSPATH;
+	WCHAR wideBuffer[ MAX_OSPATH ] = { 0 };
+
+	// Let's try checking the GOG.com launcher game ID
+	if( !RegOpenKeyEx( HKEY_LOCAL_MACHINE, "SOFTWARE\\GOG.com\\Games\\" GOGPATH_ID, 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &gogRegKey ) )
+	{
+		if( !RegQueryValueEx( gogRegKey, "PATH", NULL, NULL, ( LPBYTE ) gogPathBuffer, &gogRegKeyLen ) )
+		{
+			// Convert our path from widechar to asci
+			if( WidePath2ASCI( gogPathBuffer, gogRegKeyLen, wideBuffer ) )
+			{
+				common->Printf( "^4Using GOG.com Game ID base path '%s'\n", gogPathBuffer );
+				return gogPathBuffer;
+			}
+		}
+
+		RegCloseKey( gogRegKey );
+	}
+#endif
+
+	return gogPathBuffer;
+}
+
+
+/*
+==============
 Sys_DefaultBasePath
 ==============
 */
 const char *Sys_DefaultBasePath() {
+	idStr testbase;
+
+	// Try the exe path first
+	basepath = Sys_EXEPath();
+	if( basepath.Length() )
+	{
+		basepath.StripFilename();
+		testbase = basepath;
+		testbase += "/";
+		testbase += BASE_GAMEDIR;
+		if( Sys_IsFolder( testbase.c_str() ) == FOLDER_YES )
+		{
+			return basepath.c_str();
+		}
+		else
+		{
+			common->Printf( "no '%s' directory in exe path %s, skipping\n", BASE_GAMEDIR, basepath.c_str() );
+		}
+	}
+
+	// Try the Steam path next
+	basepath = Sys_SteamBasePath();
+	if( basepath.Length() && win32.sys_useSteamPath.GetBool() )
+	{
+		testbase = basepath;
+		testbase += "/";
+		testbase += BASE_GAMEDIR;
+		if( Sys_IsFolder( testbase.c_str() ) == FOLDER_YES )
+		{
+			return basepath.c_str();
+		}
+		else
+		{
+			common->Printf( "no '%s' directory in Steam path %s, skipping\n", BASE_GAMEDIR, basepath.c_str() );
+		}
+	}
+
+	// Try the GOG.com path next
+	basepath = Sys_GogBasePath();
+	if( basepath.Length() && win32.sys_useGOGPath.GetBool() )
+	{
+		testbase = basepath;
+		testbase += "/";
+		testbase += BASE_GAMEDIR;
+		if( Sys_IsFolder( testbase.c_str() ) == FOLDER_YES )
+		{
+			return basepath.c_str();
+		}
+		else
+		{
+			common->Printf( "no '%s' directory in GOG.com path %s, skipping\n", BASE_GAMEDIR, basepath.c_str() );
+		}
+	}
+
+	// Finally, try the current working directory as a fallback
 	return Sys_Cwd();
 }
 
@@ -846,7 +1007,7 @@ DLL Loading
 Sys_DLL_Load
 =====================
 */
-int Sys_DLL_Load( const char *dllName ) {
+intptr_t Sys_DLL_Load( const char *dllName ) {
 	HINSTANCE libHandle = LoadLibrary( dllName );
 	return (int)libHandle;
 }
@@ -1264,34 +1425,6 @@ void Win_Frame() {
 	}
 }
 
-extern "C" { void _chkstk( int size ); };
-void clrstk();
-
-/*
-====================
-TestChkStk
-====================
-*/
-void TestChkStk() {
-	int		buffer[0x1000];
-
-	buffer[0] = 1;
-}
-
-/*
-====================
-HackChkStk
-====================
-*/
-void HackChkStk() {
-	DWORD	old;
-	VirtualProtect( _chkstk, 6, PAGE_EXECUTE_READWRITE, &old );
-	*(byte *)_chkstk = 0xe9;
-	*(int *)((int)_chkstk+1) = (int)clrstk - (int)_chkstk - 5;
-
-	TestChkStk();
-}
-
 /*
 ====================
 GetExceptionCodeInfo
@@ -1331,18 +1464,22 @@ EmailCrashReport
 ====================
 */
 void EmailCrashReport( LPSTR messageText ) {
+#if 0
 	static int lastEmailTime = 0;
 
-	if ( Sys_Milliseconds() < lastEmailTime + 10000 ) {
+	if( Sys_Milliseconds() < lastEmailTime + 10000 )
+	{
 		return;
 	}
 
 	lastEmailTime = Sys_Milliseconds();
 
-	HINSTANCE mapi = LoadLibrary( "MAPI32.DLL" ); 
-	if( mapi ) {
-		LPMAPISENDMAIL	MAPISendMail = ( LPMAPISENDMAIL )GetProcAddress( mapi, "MAPISendMail" );
-		if( MAPISendMail ) {
+	HINSTANCE mapi = LoadLibrary( "MAPI32.DLL" );
+	if( mapi )
+	{
+		LPMAPISENDMAIL	MAPISendMail = ( LPMAPISENDMAIL ) GetProcAddress( mapi, "MAPISendMail" );
+		if( MAPISendMail )
+		{
 			MapiRecipDesc toProgrammers =
 			{
 				0,										// ulReserved
@@ -1365,84 +1502,15 @@ void EmailCrashReport( LPSTR messageText ) {
 				&message,							// lpMapiMessage lpMessage
 				MAPI_DIALOG,						// FLAGS flFlags
 				0									// ULONG ulReserved
-				);
+			);
 		}
 		FreeLibrary( mapi );
 	}
+#endif
+	assert( 0 && "No email" );
 }
 
 int Sys_FPU_PrintStateFlags( char *ptr, int ctrl, int stat, int tags, int inof, int inse, int opof, int opse );
-
-/*
-====================
-_except_handler
-====================
-*/
-EXCEPTION_DISPOSITION __cdecl _except_handler( struct _EXCEPTION_RECORD *ExceptionRecord, void * EstablisherFrame,
-												struct _CONTEXT *ContextRecord, void * DispatcherContext ) {
-
-	static char msg[ 8192 ];
-	char FPUFlags[2048];
-
-	Sys_FPU_PrintStateFlags( FPUFlags, ContextRecord->FloatSave.ControlWord,
-										ContextRecord->FloatSave.StatusWord,
-										ContextRecord->FloatSave.TagWord,
-										ContextRecord->FloatSave.ErrorOffset,
-										ContextRecord->FloatSave.ErrorSelector,
-										ContextRecord->FloatSave.DataOffset,
-										ContextRecord->FloatSave.DataSelector );
-
-
-	sprintf( msg, 
-		"Please describe what you were doing when DOOM 3 crashed!\n"
-		"If this text did not pop into your email client please copy and email it to programmers@idsoftware.com\n"
-			"\n"
-			"-= FATAL EXCEPTION =-\n"
-			"\n"
-			"%s\n"
-			"\n"
-			"0x%x at address 0x%08p\n"
-			"\n"
-			"%s\n"
-			"\n"
-			"EAX = 0x%08x EBX = 0x%08x\n"
-			"ECX = 0x%08x EDX = 0x%08x\n"
-			"ESI = 0x%08x EDI = 0x%08x\n"
-			"EIP = 0x%08x ESP = 0x%08x\n"
-			"EBP = 0x%08x EFL = 0x%08x\n"
-			"\n"
-			"CS = 0x%04x\n"
-			"SS = 0x%04x\n"
-			"DS = 0x%04x\n"
-			"ES = 0x%04x\n"
-			"FS = 0x%04x\n"
-			"GS = 0x%04x\n"
-			"\n"
-			"%s\n",
-			com_version.GetString(),
-			ExceptionRecord->ExceptionCode,
-			ExceptionRecord->ExceptionAddress,
-			GetExceptionCodeInfo( ExceptionRecord->ExceptionCode ),
-			ContextRecord->Eax, ContextRecord->Ebx,
-			ContextRecord->Ecx, ContextRecord->Edx,
-			ContextRecord->Esi, ContextRecord->Edi,
-			ContextRecord->Eip, ContextRecord->Esp,
-			ContextRecord->Ebp, ContextRecord->EFlags,
-			ContextRecord->SegCs,
-			ContextRecord->SegSs,
-			ContextRecord->SegDs,
-			ContextRecord->SegEs,
-			ContextRecord->SegFs,
-			ContextRecord->SegGs,
-			FPUFlags
-		);
-
-	EmailCrashReport( msg );
-	common->FatalError( msg );
-
-    // Tell the OS to restart the faulting instruction
-    return ExceptionContinueExecution;
-}
 
 #define TEST_FPU_EXCEPTIONS	/*	FPU_EXCEPTION_INVALID_OPERATION |		*/	\
 							/*	FPU_EXCEPTION_DENORMALIZED_OPERAND |	*/	\
@@ -1464,16 +1532,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	Sys_SetPhysicalWorkMemory( 192 << 20, 1024 << 20 );
 
 	Sys_GetCurrentMemoryStatus( exeLaunchMemoryStats );
-
-#if 0
-    DWORD handler = (DWORD)_except_handler;
-    __asm
-    {                           // Build EXCEPTION_REGISTRATION record:
-        push    handler         // Address of handler function
-        push    FS:[0]          // Address of previous handler
-        mov     FS:[0],ESP      // Install new EXECEPTION_REGISTRATION
-    }
-#endif
 
 	win32.hInstance = hInstance;
 	idStr::Copynz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
@@ -1547,42 +1605,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// never gets here
 	return 0;
-}
-
-/*
-====================
-clrstk
-
-I tried to get the run time to call this at every function entry, but
-====================
-*/
-static int	parmBytes;
-__declspec( naked ) void clrstk() {
-	// eax = bytes to add to stack
-	__asm {
-		mov		[parmBytes],eax
-        neg     eax                     ; compute new stack pointer in eax
-        add     eax,esp
-        add     eax,4
-        xchg    eax,esp
-        mov     eax,dword ptr [eax]		; copy the return address
-        push    eax
-        
-        ; clear to zero
-        push	edi
-        push	ecx
-        mov		edi,esp
-        add		edi,12
-        mov		ecx,[parmBytes]
-		shr		ecx,2
-        xor		eax,eax
-		cld
-        rep	stosd
-        pop		ecx
-        pop		edi
-        
-        ret
-	}
 }
 
 /*

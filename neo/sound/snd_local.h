@@ -82,12 +82,26 @@ typedef enum {
 
 #define OPERATION_SET 1
 
-#include <dxsdkver.h>
+#include <mmdeviceapi.h>
+#include <initguid.h> // For the pkey defines to be properly instantiated.
+#include <propkeydef.h>
+#include <Functiondiscoverykeys_devpkey.h>
+#include <string> // TODO: add idSmallString
+
+DEFINE_PROPERTYKEY( PKEY_AudioEndpoint_Path, 0x9c119480, 0xddc2, 0x4954, 0xa1, 0x50, 0x5b, 0xd2, 0x40, 0xd4, 0x54, 0xad, 1 );
+
+#pragma comment(lib,"xaudio2.lib")
+
+struct AudioDevice
+{
+	std::wstring id;
+	std::wstring name;
+};
 
 #include <xaudio2.h>
 #include <xaudio2fx.h>
 #include <X3DAudio.h>
-#include <xma2defs.h>
+
 #include "XAudio2/XA2_SoundSample.h"
 #include "XAudio2/XA2_SoundVoice.h"
 #include "XAudio2/XA2_SoundHardware.h"

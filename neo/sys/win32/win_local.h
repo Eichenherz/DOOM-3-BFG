@@ -91,7 +91,7 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 void Conbuf_AppendText( const char *msg );
 
-typedef struct {
+struct Win32Vars_t {
 	HWND			hWnd;
 	HINSTANCE		hInstance;
 
@@ -140,6 +140,9 @@ typedef struct {
 	static idCVar	win_timerUpdate;
 	static idCVar	win_allowMultipleInstances;
 
+	static idCVar	sys_useSteamPath;
+	static idCVar	sys_useGOGPath;
+
 	CRITICAL_SECTION criticalSections[MAX_CRITICAL_SECTIONS];
 
 	HINSTANCE		hInstDI;			// direct input
@@ -159,8 +162,8 @@ typedef struct {
 	int				wglErrors;
 	// SMP acceleration vars
 
-} Win32Vars_t;
+};
 
-extern Win32Vars_t	win32;
+extern Win32Vars_t win32;
 
 #endif /* !__WIN_LOCAL_H__ */

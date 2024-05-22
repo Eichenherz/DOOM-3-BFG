@@ -443,7 +443,7 @@ process_restart( j_decompress_ptr cinfo ) {
 METHODDEF boolean
 decode_mcu( j_decompress_ptr cinfo, JBLOCKROW * MCU_data ) {
     huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
-    register int s, k, r;
+    int s, k, r;
     int blkn, ci;
     JBLOCKROW block;
     BITREAD_STATE_VARS;
