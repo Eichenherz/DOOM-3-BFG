@@ -55,15 +55,15 @@ static  int32_t sample_increment, sample_correction; /*samples per MIDI delta-t*
 static  int32_t read_local(void* buffer, size_t len, size_t count)
 {
 	if (fp && len > 0) {
-		return (int32_t)fp->Read(buffer, len * count ) / len;
+		return (int32_t)fp->Read(buffer, (int) (len * count) ) / (int) len;
 	} else if( local_buffer != NULL ) {
 		if (len * count + local_buffer_cur > local_buffer_length) {
 			memcpy(buffer, &local_buffer[local_buffer_cur], local_buffer_length - local_buffer_cur);
-			return(int32_t)(local_buffer_length - local_buffer_cur)/len;
+			return (int32_t)(local_buffer_length - local_buffer_cur)/len;
 		} else {
 			memcpy(buffer, &local_buffer[local_buffer_cur], len * count);
 			local_buffer_cur += len * count;
-			return(count);
+			return (int32_t) count;
 		}
 	}
 

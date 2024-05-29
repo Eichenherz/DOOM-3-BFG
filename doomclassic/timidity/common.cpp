@@ -87,7 +87,7 @@ idFile * open_file(const char *name, int decompress, int noise_mode)
 		while (plp)  /* Try along the path then */
 		{
 			*current_filename=0;
-			l=strlen(plp->path);
+			l= (int) strlen(plp->path);
 			if(l)
 			{
 				strcpy(current_filename, plp->path);
@@ -128,7 +128,7 @@ void skip(idFile * fp, size_t len)
 		c=len;
 		if (c>1024) c=1024;
 		len-=c;
-		if (c!=fp->Read(tmp, c ))
+		if (c!=fp->Read(tmp, (int)c ))
 			ctl->cmsg(CMSG_ERROR, VERB_NORMAL, "%s: skip: %s",
 			current_filename, strerror(errno));
 	}
@@ -145,7 +145,7 @@ void *safe_malloc(size_t count)
 			"Strange, I feel like allocating %d bytes. This must be a bug.",
 			count);
 	}
-	else if ((p=Real_Tim_Malloc(count)))
+	else if ((p=Real_Tim_Malloc((int)count)))
 		return p;
 	else
 		ctl->cmsg(CMSG_FATAL, VERB_NORMAL, "Sorry. Couldn't malloc %d bytes.", count);
