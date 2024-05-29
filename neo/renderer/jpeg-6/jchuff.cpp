@@ -53,7 +53,7 @@ typedef struct {
 
 
 typedef struct {
-    struct jpeg_entropy_encoder pub;/* public fields */
+    jpeg_entropy_encoder pub;/* public fields */
 
     savable_state saved;    /* Bit buffer & DC state at start of MCU */
 
@@ -250,7 +250,7 @@ jpeg_make_c_derived_tbl( j_compress_ptr cinfo, JHUFF_TBL * htbl,
 LOCAL boolean
 dump_buffer( working_state * state ) {
 /* Empty the output buffer; return TRUE if successful, FALSE if must suspend */
-    struct jpeg_destination_mgr * dest = state->cinfo->dest;
+    jpeg_destination_mgr * dest = state->cinfo->dest;
 
     if ( !( *dest->empty_output_buffer )( state->cinfo ) ) {
         return FALSE;
@@ -275,8 +275,8 @@ LOCAL boolean
 emit_bits( working_state * state, unsigned int code, int size ) {
 /* Emit some bits; return TRUE if successful, FALSE if must suspend */
 /* This routine is heavily used, so it's worth coding tightly. */
-    register INT32 put_buffer = (INT32) code;
-    register int put_bits = state->cur.put_bits;
+    INT32 put_buffer = (INT32) code;
+    int put_bits = state->cur.put_bits;
 
     /* if size is 0, caller used an invalid Huffman table entry */
     if ( size == 0 ) {
@@ -325,9 +325,9 @@ flush_bits( working_state * state ) {
 LOCAL boolean
 encode_one_block( working_state * state, JCOEFPTR block, int last_dc_val,
                   c_derived_tbl * dctbl, c_derived_tbl * actbl ) {
-    register int temp, temp2;
-    register int nbits;
-    register int k, r, i;
+    int temp, temp2;
+    int nbits;
+    int k, r, i;
 
     /* Encode the DC coefficient difference per section F.1.2.1 */
 
@@ -554,9 +554,9 @@ finish_pass_huff( j_compress_ptr cinfo ) {
 LOCAL void
 htest_one_block( JCOEFPTR block, int last_dc_val,
                  long dc_counts[], long ac_counts[] ) {
-    register int temp;
-    register int nbits;
-    register int k, r;
+    int temp;
+    int nbits;
+    int k, r;
 
     /* Encode the DC coefficient difference per section F.1.2.1 */
 

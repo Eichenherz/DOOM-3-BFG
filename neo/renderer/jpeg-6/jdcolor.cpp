@@ -16,7 +16,7 @@
 /* Private subobject */
 
 typedef struct {
-    struct jpeg_color_deconverter pub;/* public fields */
+    jpeg_color_deconverter pub;/* public fields */
 
     /* Private state for YCC->RGB conversion */
     int *   Cr_r_tab;   /* => table for Cr to R conversion */
@@ -120,17 +120,17 @@ ycc_rgb_convert( j_decompress_ptr cinfo,
                  JSAMPIMAGE input_buf, JDIMENSION input_row,
                  JSAMPARRAY output_buf, int num_rows ) {
     my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-    register int y, cb, cr;
-    register JSAMPROW outptr;
-    register JSAMPROW inptr0, inptr1, inptr2;
-    register JDIMENSION col;
+    int y, cb, cr;
+    JSAMPROW outptr;
+    JSAMPROW inptr0, inptr1, inptr2;
+    JDIMENSION col;
     JDIMENSION num_cols = cinfo->output_width;
     /* copy these pointers into registers if possible */
-    register JSAMPLE * range_limit = cinfo->sample_range_limit;
-    register int * Crrtab = cconvert->Cr_r_tab;
-    register int * Cbbtab = cconvert->Cb_b_tab;
-    register INT32 * Crgtab = cconvert->Cr_g_tab;
-    register INT32 * Cbgtab = cconvert->Cb_g_tab;
+    JSAMPLE * range_limit = cinfo->sample_range_limit;
+    int * Crrtab = cconvert->Cr_r_tab;
+    int * Cbbtab = cconvert->Cb_b_tab;
+    INT32 * Crgtab = cconvert->Cr_g_tab;
+    INT32 * Cbgtab = cconvert->Cb_g_tab;
     SHIFT_TEMPS
 
     while ( --num_rows >= 0 ) {
@@ -167,9 +167,9 @@ METHODDEF void
 null_convert( j_decompress_ptr cinfo,
               JSAMPIMAGE input_buf, JDIMENSION input_row,
               JSAMPARRAY output_buf, int num_rows ) {
-    register JSAMPROW inptr, outptr;
-    register JDIMENSION count;
-    register int num_components = cinfo->num_components;
+    JSAMPROW inptr, outptr;
+    JDIMENSION count;
+    int num_components = cinfo->num_components;
     JDIMENSION num_cols = cinfo->output_width;
     int ci;
 
@@ -215,17 +215,17 @@ ycck_cmyk_convert( j_decompress_ptr cinfo,
                    JSAMPIMAGE input_buf, JDIMENSION input_row,
                    JSAMPARRAY output_buf, int num_rows ) {
     my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-    register int y, cb, cr;
-    register JSAMPROW outptr;
-    register JSAMPROW inptr0, inptr1, inptr2, inptr3;
-    register JDIMENSION col;
+    int y, cb, cr;
+    JSAMPROW outptr;
+    JSAMPROW inptr0, inptr1, inptr2, inptr3;
+    JDIMENSION col;
     JDIMENSION num_cols = cinfo->output_width;
     /* copy these pointers into registers if possible */
-    register JSAMPLE * range_limit = cinfo->sample_range_limit;
-    register int * Crrtab = cconvert->Cr_r_tab;
-    register int * Cbbtab = cconvert->Cb_b_tab;
-    register INT32 * Crgtab = cconvert->Cr_g_tab;
-    register INT32 * Cbgtab = cconvert->Cb_g_tab;
+    JSAMPLE * range_limit = cinfo->sample_range_limit;
+    int * Crrtab = cconvert->Cr_r_tab;
+    int * Cbbtab = cconvert->Cb_b_tab;
+    INT32 * Crgtab = cconvert->Cr_g_tab;
+    INT32 * Cbgtab = cconvert->Cb_g_tab;
     SHIFT_TEMPS
 
     while ( --num_rows >= 0 ) {
@@ -275,7 +275,7 @@ jinit_color_deconverter( j_decompress_ptr cinfo ) {
     cconvert = (my_cconvert_ptr)
                ( *cinfo->mem->alloc_small )( (j_common_ptr) cinfo, JPOOL_IMAGE,
                                             SIZEOF( my_color_deconverter ) );
-    cinfo->cconvert = (struct jpeg_color_deconverter *) cconvert;
+    cinfo->cconvert = (jpeg_color_deconverter *) cconvert;
     cconvert->pub.start_pass = start_pass_dcolor;
 
     /* Make sure num_components agrees with jpeg_color_space */

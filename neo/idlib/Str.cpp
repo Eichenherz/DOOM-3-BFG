@@ -170,7 +170,7 @@ void idStr::operator=( const char *text ) {
 		return;
 	}
 
-	l = strlen( text );
+	l = (int)strlen( text );
 	EnsureAlloced( l + 1, false );
 	strcpy( data, text );
 	len = l;
@@ -187,7 +187,7 @@ int idStr::FindChar( const char *str, const char c, int start, int end ) {
 	int i;
 
 	if ( end == -1 ) {
-		end = strlen( str ) - 1;
+		end = (int)(strlen( str ) - 1);
 	}
 	for ( i = start; i <= end; i++ ) {
 		if ( str[i] == c ) {
@@ -208,9 +208,9 @@ int idStr::FindText( const char *str, const char *text, bool casesensitive, int 
 	int l, i, j;
 
 	if ( end == -1 ) {
-		end = strlen( str );
+		end = (int)strlen( str );
 	}
-	l = end - strlen( text );
+	l = end - (int)strlen( text );
 	for ( i = start; i <= l; i++ ) {
 		if ( casesensitive ) {
 			for ( j = 0; text[j]; j++ ) {
@@ -612,7 +612,7 @@ idStr::StripLeading
 void idStr::StripLeading( const char *string ) {
 	int l;
 
-	l = strlen( string );
+	l = (int)strlen( string );
 	if ( l > 0 ) {
 		while ( !Cmpn( string, l ) ) {
 			memmove( data, data + l, len - l + 1 );
@@ -629,7 +629,7 @@ idStr::StripLeadingOnce
 bool idStr::StripLeadingOnce( const char *string ) {
 	int l;
 
-	l = strlen( string );
+	l = (int)strlen( string );
 	if ( ( l > 0 ) && !Cmpn( string, l ) ) {
 		memmove( data, data + l, len - l + 1 );
 		len -= l;
@@ -660,7 +660,7 @@ idStr::StripLeading
 void idStr::StripTrailing( const char *string ) {
 	int l;
 
-	l = strlen( string );
+	l = (int)strlen( string );
 	if ( l > 0 ) {
 		while ( ( len >= l ) && !Cmpn( string, data + len - l, l ) ) {
 			len -= l;
@@ -677,7 +677,7 @@ idStr::StripTrailingOnce
 bool idStr::StripTrailingOnce( const char *string ) {
 	int l;
 
-	l = strlen( string );
+	l = (int)strlen( string );
 	if ( ( l > 0 ) && ( len >= l ) && !Cmpn( string, data + len - l, l ) ) {
 		len -= l;
 		data[len] = '\0';
@@ -708,8 +708,8 @@ idStr::Replace
 ============
 */
 bool idStr::Replace( const char *old, const char *nw ) {
-	int oldLen = strlen( old );
-	int newLen = strlen( nw );
+	int oldLen = (int)strlen( old );
+	int newLen = (int)strlen( nw );
 
 	// Work out how big the new string will be
 	int count = 0;
@@ -738,7 +738,7 @@ bool idStr::Replace( const char *old, const char *nw ) {
 			}
 		}
 		data[j] = 0;
-		len = strlen( data );
+		len = (int)strlen( data );
 		return true;
 	}
 	return false;
@@ -998,7 +998,7 @@ void idStr::AppendPath( const char *text ) {
 
 	if ( text && text[i] ) {
 		pos = len;
-		EnsureAlloced( len + strlen( text ) + 2 );
+		EnsureAlloced( len + (int)strlen( text ) + 2 );
 
 		if ( pos ) {
 			if ( data[ pos-1 ] != '/' ) {
@@ -1562,7 +1562,7 @@ idStr::Append
 void idStr::Append( char *dest, int size, const char *src ) {
 	int		l1;
 
-	l1 = strlen( dest );
+	l1 = (int) strlen( dest );
 	if ( l1 >= size ) {
 		idLib::common->Error( "idStr::Append: already overflowed" );
 	}

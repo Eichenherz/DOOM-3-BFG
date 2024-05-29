@@ -58,7 +58,7 @@ typedef JMETHOD ( void, downsample1_ptr,
 /* Private subobject */
 
 typedef struct {
-    struct jpeg_downsampler pub;/* public fields */
+    jpeg_downsampler pub;/* public fields */
 
     /* Downsampling method pointers, one per component */
     downsample1_ptr methods[MAX_COMPONENTS];
@@ -85,9 +85,9 @@ start_pass_downsample( j_compress_ptr cinfo ) {
 LOCAL void
 expand_right_edge( JSAMPARRAY image_data, int num_rows,
                    JDIMENSION input_cols, JDIMENSION output_cols ) {
-    register JSAMPROW ptr;
-    register JSAMPLE pixval;
-    register int count;
+    JSAMPROW ptr;
+    JSAMPLE pixval;
+    int count;
     int row;
     int numcols = (int) ( output_cols - input_cols );
 
@@ -210,8 +210,8 @@ h2v1_downsample( j_compress_ptr cinfo, jpeg_component_info * compptr,
     int outrow;
     JDIMENSION outcol;
     JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr, outptr;
-    register int bias;
+    JSAMPROW inptr, outptr;
+    int bias;
 
     /* Expand input data enough to let all the output samples be generated
      * by the standard loop.  Special-casing padded output would be more
@@ -246,8 +246,8 @@ h2v2_downsample( j_compress_ptr cinfo, jpeg_component_info * compptr,
     int inrow, outrow;
     JDIMENSION outcol;
     JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr0, inptr1, outptr;
-    register int bias;
+    JSAMPROW inptr0, inptr1, outptr;
+    int bias;
 
     /* Expand input data enough to let all the output samples be generated
      * by the standard loop.  Special-casing padded output would be more
@@ -289,7 +289,7 @@ h2v2_smooth_downsample( j_compress_ptr cinfo, jpeg_component_info * compptr,
     int inrow, outrow;
     JDIMENSION colctr;
     JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr0, inptr1, above_ptr, below_ptr, outptr;
+    JSAMPROW inptr0, inptr1, above_ptr, below_ptr, outptr;
     INT32 membersum, neighsum, memberscale, neighscale;
 
     /* Expand input data enough to let all the output samples be generated
@@ -394,7 +394,7 @@ fullsize_smooth_downsample( j_compress_ptr cinfo, jpeg_component_info * compptr,
     int outrow;
     JDIMENSION colctr;
     JDIMENSION output_cols = compptr->width_in_blocks * DCTSIZE;
-    register JSAMPROW inptr, above_ptr, below_ptr, outptr;
+    JSAMPROW inptr, above_ptr, below_ptr, outptr;
     INT32 membersum, neighsum, memberscale, neighscale;
     int colsum, lastcolsum, nextcolsum;
 

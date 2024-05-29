@@ -324,14 +324,6 @@ static void GLW_GetWGLExtensionsWithFakeWindow() {
 //=============================================================================
 
 /*
-====================
-GLW_WM_CREATE
-====================
-*/
-void GLW_WM_CREATE( HWND hWnd ) {
-}
-
-/*
 ========================
 CreateOpenGLContextOnDC
 ========================
@@ -545,7 +537,7 @@ static void GLW_CreateWindowClasses() {
 	wc.hInstance     = win32.hInstance;
 	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wc.hCursor       = NULL;
-	wc.hbrBackground = (struct HBRUSH__ *)COLOR_GRAYTEXT;
+	wc.hbrBackground = (HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_WINDOW_CLASS_NAME;
 
@@ -563,7 +555,7 @@ static void GLW_CreateWindowClasses() {
 	wc.hInstance     = win32.hInstance;
 	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (struct HBRUSH__ *)COLOR_GRAYTEXT;
+	wc.hbrBackground = (HBRUSH__ *)COLOR_GRAYTEXT;
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = WIN32_FAKE_WINDOW_CLASS_NAME;
 
@@ -1016,7 +1008,7 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 		return false;
 	}
 
-	SetForegroundWindow( win32.hWnd );
+	//SetForegroundWindow( win32.hWnd );
 	SetFocus( win32.hWnd );
 
 	glConfig.isFullscreen = parms.fullScreen;

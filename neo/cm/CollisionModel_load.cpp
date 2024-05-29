@@ -3082,6 +3082,7 @@ cm_model_t * idCollisionModelManagerLocal::LoadBinaryModelFromFile( idFile *file
 		file->ReadBig( brushes[i]->primitiveNum );
 		file->ReadBigArray( brushes[i]->planes, brushes[i]->numPlanes );
 	}
+
 	struct local {
 		static void ReadNodeTree( idFile * file, cm_model_t * model, cm_node_t * node, idList< cm_polygon_t * > & polys, idList< cm_brush_t * > & brushes ) {
 			file->ReadBig( node->planeType );
@@ -3109,6 +3110,7 @@ cm_model_t * idCollisionModelManagerLocal::LoadBinaryModelFromFile( idFile *file
 			}
 		}
 	};
+
 	model->node = AllocNode( model, model->numNodes + 1 );
 	local::ReadNodeTree( file, model, model->node, polys, brushes );
 
@@ -3116,8 +3118,10 @@ cm_model_t * idCollisionModelManagerLocal::LoadBinaryModelFromFile( idFile *file
 	// assert( model->nodeBlocks != NULL && model->nodeBlocks->next == NULL && model->nodeBlocks->nextNode == NULL );
 	assert( model->brushRefBlocks == NULL || ( model->brushRefBlocks->next == NULL && model->brushRefBlocks->nextRef == NULL ) );
 	assert( model->polygonRefBlocks == NULL || ( model->polygonRefBlocks->next == NULL && model->polygonRefBlocks->nextRef == NULL ) );
-	assert( model->polygonBlock->bytesRemaining == 0 );
-	assert( model->brushBlock->bytesRemaining == 0 );
+
+	// NOTE: From RBDOOM3 these are for non-x64 builds
+	//assert( model->polygonBlock->bytesRemaining == 0 );
+	//assert( model->brushBlock->bytesRemaining == 0 );
 
 	model->usedMemory = model->numVertices * sizeof(cm_vertex_t) +
 		model->numEdges * sizeof(cm_edge_t) +

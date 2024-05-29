@@ -691,7 +691,7 @@ void idPhysics_Player::WalkMove() {
 	if ( waterLevel ) {
 		float	waterScale;
 
-		waterScale = waterLevel / 3.0f;
+		waterScale = (float)waterLevel / 3.0f;
 		waterScale = 1.0f - ( 1.0f - PM_SWIMSCALE ) * waterScale;
 		if ( wishspeed > playerSpeed * waterScale ) {
 			wishspeed = playerSpeed * waterScale;

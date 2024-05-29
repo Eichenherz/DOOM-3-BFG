@@ -485,8 +485,8 @@ void			Sys_SetPhysicalWorkMemory( int minBytes, int maxBytes );
 
 // DLL loading, the path should be a fully qualified OS path to the DLL file to be loaded
 intptr_t		Sys_DLL_Load( const char *dllName );
-void *			Sys_DLL_GetProcAddress( int dllHandle, const char *procName );
-void			Sys_DLL_Unload( int dllHandle );
+void *			Sys_DLL_GetProcAddress( intptr_t dllHandle, const char *procName );
+void			Sys_DLL_Unload( intptr_t dllHandle );
 
 // event generation
 void			Sys_GenerateEvents();
@@ -609,7 +609,7 @@ public:
 
 	void		SendPacket( const netadr_t to, const void *data, int size );
 
-	void		SetSilent( bool silent ) { this->silent = silent; }
+	void		SetSilent( bool _silent ) { this->silent = _silent; }
 	bool		GetSilent() const { return silent; }
 
 	int			packetsRead;

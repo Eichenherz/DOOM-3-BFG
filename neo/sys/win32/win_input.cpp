@@ -44,10 +44,6 @@ DIRECT INPUT KEYBOARD CONTROL
 
 bool IN_StartupKeyboard() {
     HRESULT hr;
-    bool    bExclusive;
-    bool    bForeground;
-    bool    bImmediate;
-    bool    bDisableWindowsKey;
     DWORD   dwCoopFlags;
 
 	if (!win32.g_pdi) {
@@ -61,25 +57,20 @@ bool IN_StartupKeyboard() {
 	}
 
     // Detrimine where the buffer would like to be allocated 
-    bExclusive         = false;
-    bForeground        = true;
-    bImmediate         = false;
-    bDisableWindowsKey = true;
+	// TODO: pass as params
+    bool bExclusive         = false;
+    bool bForeground        = true;
+    bool bImmediate         = false;
+    bool bDisableWindowsKey = false;
 
-    if( bExclusive )
-        dwCoopFlags = DISCL_EXCLUSIVE;
-    else
-        dwCoopFlags = DISCL_NONEXCLUSIVE;
-
-    if( bForeground )
-        dwCoopFlags |= DISCL_FOREGROUND;
-    else
-        dwCoopFlags |= DISCL_BACKGROUND;
+	dwCoopFlags = ( bExclusive ) ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE;
+	dwCoopFlags |= ( bForeground ) ? DISCL_FOREGROUND : DISCL_BACKGROUND;
 
     // Disabling the windows key is only allowed only if we are in foreground nonexclusive
-    if( bDisableWindowsKey && !bExclusive && bForeground )
-        dwCoopFlags |= DISCL_NOWINKEY;
-
+    if( bDisableWindowsKey && !bExclusive && bForeground ) {
+		dwCoopFlags |= DISCL_NOWINKEY;
+	}
+    
     // Obtain an interface to the system keyboard device.
     if( FAILED( hr = win32.g_pdi->CreateDevice( GUID_SysKeyboard, &win32.g_pKeyboard, NULL ) ) ) {
 		common->Printf("keyboard: couldn't find a keyboard device\n");
@@ -93,8 +84,9 @@ bool IN_StartupKeyboard() {
     //
     // This tells DirectInput that we will be passing an array
     // of 256 bytes to IDirectInputDevice::GetDeviceState.
-    if( FAILED( hr = win32.g_pKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
-        return false;
+    if( FAILED( hr = win32.g_pKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) ) {
+		return false;
+	}
     
     // Set the cooperativity level to let DirectInput know how
     // this device should interact with the system and with other
@@ -127,8 +119,9 @@ bool IN_StartupKeyboard() {
         dipdw.diph.dwHow        = DIPH_DEVICE;
         dipdw.dwData            = DINPUT_BUFFERSIZE; // Arbitary buffer size
 
-        if( FAILED( hr = win32.g_pKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) )
+        if( FAILED( hr = win32.g_pKeyboard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph ) ) ) {
             return false;
+		}
     }
 
     // Acquire the newly created device
@@ -214,8 +207,8 @@ bool IN_InitDIMouse() {
 		return false;
 	}
     
-	// set the cooperativity level.
-	hr = win32.g_pMouse->SetCooperativeLevel( win32.hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+	//// set the cooperativity level.
+	//hr = win32.g_pMouse->SetCooperativeLevel( win32.hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 
 	if (FAILED(hr)) {
 		common->Printf ("mouse: Couldn't set DI coop level\n");

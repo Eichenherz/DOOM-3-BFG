@@ -177,12 +177,13 @@
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</TreatWarningAsError>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(DXSDK_DIR)\Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp20</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
       <LanguageStandard_C Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdc17</LanguageStandard_C>
       <LanguageStandard_C Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdc17</LanguageStandard_C>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ConformanceMode>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4458;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</TreatWarningAsError>
@@ -353,6 +354,7 @@
     <ClInclude Include="sys\win32\win_local.h" />
     <ClInclude Include="sys\win32\rc\doom_resource.h" />
     <ClInclude Include="sys\win32\win_localuser.h" />
+    <ClInclude Include="sys\win32\win_nanoafx.h" />
     <ClInclude Include="sys\win32\win_signin.h" />
     <ClInclude Include="ui\BindWindow.h" />
     <ClInclude Include="ui\ChoiceWindow.h" />
@@ -375,7 +377,6 @@
     <ClInclude Include="ui\UserInterfaceLocal.h" />
     <ClInclude Include="ui\Window.h" />
     <ClInclude Include="ui\Winvar.h" />
-    <ClInclude Include="win_nanoafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aas\AASFile.cpp" />

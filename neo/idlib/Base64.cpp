@@ -93,7 +93,7 @@ idBase64::Decode
 ============
 */
 int idBase64::Decode( byte *to ) const {
-	unsigned long w;
+	unsigned int w;
 	int i, j;
 	size_t n;
 	static char base64_to_sixtet[256];

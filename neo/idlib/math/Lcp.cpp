@@ -50,7 +50,7 @@ ALIGN16( const __m128 SIMD_SP_zero )							= { 0.0f, 0.0f, 0.0f, 0.0f };
 ALIGN16( const __m128 SIMD_SP_one )								= { 1.0f, 1.0f, 1.0f, 1.0f };
 ALIGN16( const __m128 SIMD_SP_two )								= { 2.0f, 2.0f, 2.0f, 2.0f };
 ALIGN16( const __m128 SIMD_SP_tiny )							= { 1e-10f, 1e-10f, 1e-10f, 1e-10f };
-ALIGN16( const __m128 SIMD_SP_infinity )						= { idMath::INFINITY, idMath::INFINITY, idMath::INFINITY, idMath::INFINITY };
+ALIGN16( const __m128 SIMD_SP_infinity )						= { idMath::INFINITUM, idMath::INFINITUM, idMath::INFINITUM, idMath::INFINITUM };
 ALIGN16( const __m128 SIMD_SP_LCP_DELTA_ACCEL_EPSILON )			= { LCP_DELTA_ACCEL_EPSILON, LCP_DELTA_ACCEL_EPSILON, LCP_DELTA_ACCEL_EPSILON, LCP_DELTA_ACCEL_EPSILON };
 ALIGN16( const __m128 SIMD_SP_LCP_DELTA_FORCE_EPSILON )			= { LCP_DELTA_FORCE_EPSILON, LCP_DELTA_FORCE_EPSILON, LCP_DELTA_FORCE_EPSILON, LCP_DELTA_FORCE_EPSILON };
 ALIGN16( const __m128 SIMD_SP_LCP_BOUND_EPSILON )				= { LCP_BOUND_EPSILON, LCP_BOUND_EPSILON, LCP_BOUND_EPSILON, LCP_BOUND_EPSILON };
@@ -81,7 +81,7 @@ Assumes the source and destination have the same memory alignment.
 */
 static void Multiply_SIMD( float * dst, const float * src0, const float * src1, const int count ) {
 	int i = 0;
-	for ( ; ( (unsigned int)dst & 0xF ) != 0 && i < count; i++ ) {
+	for ( ; ( (uintptr_t)dst & 0xF ) != 0 && i < count; i++ ) {
 		dst[i] = src0[i] * src1[i];
 	}
 
@@ -129,7 +129,7 @@ Assumes the source and destination have the same memory alignment.
 */
 static void MultiplyAdd_SIMD( float * dst, const float constant, const float * src, const int count ) {
 	int i = 0;
-	for ( ; ( (unsigned int)dst & 0xF ) != 0 && i < count; i++ ) {
+	for ( ; ( (uintptr_t)dst & 0xF ) != 0 && i < count; i++ ) {
 		dst[i] += constant * src[i];
 	}
 
@@ -1386,7 +1386,7 @@ static void GetMaxStep_SIMD( const float * f, const float * a, const float * del
 		float step = ( forceLimit - f[d] ) / deltaForce;
 		int setSide = ( deltaForce < 0.0f ) ? -1 : 1;
 		int m0 = ( fabs( deltaForce ) > LCP_DELTA_FORCE_EPSILON );
-		int m1 = ( fabs( forceLimit ) != idMath::INFINITY );
+		int m1 = ( fabs( forceLimit ) != idMath::INFINITUM );
 		int m2 = ( step < maxStep );
 		int m3 = ( m0 & m1 & m2 );
 		maxStep = m3 ? step : maxStep;
@@ -1401,7 +1401,7 @@ static void GetMaxStep_SIMD( const float * f, const float * a, const float * del
 		int m0 = ( fabs( deltaForce ) > LCP_DELTA_FORCE_EPSILON );
 		float step = ( forceLimit - f[i] ) / ( m0 ? deltaForce : 1.0f );
 		int setSide = ( deltaForce < 0.0f ) ? -1 : 1;
-		int m1 = ( fabs( forceLimit ) != idMath::INFINITY );
+		int m1 = ( fabs( forceLimit ) != idMath::INFINITUM );
 		int m2 = ( step < maxStep );
 		int m3 = ( m0 & m1 & m2 );
 		maxStep = m3 ? step : maxStep;
@@ -2065,7 +2065,7 @@ bool idLCP_Square::Solve( const idMatX &o_m, idVecX &o_x, const idVecX &o_b, con
 	// permute input so all unbounded variables come first
 	numUnbounded = 0;
 	for ( int i = 0; i < m.GetNumRows(); i++ ) {
-		if ( lo[i] == -idMath::INFINITY && hi[i] == idMath::INFINITY ) {
+		if ( lo[i] == -idMath::INFINITUM && hi[i] == idMath::INFINITUM ) {
 			if ( numUnbounded != i ) {
 				Swap( numUnbounded, i );
 			}
@@ -2127,10 +2127,10 @@ bool idLCP_Square::Solve( const idMatX &o_m, idVecX &o_x, const idVecX &o_b, con
 			}
 			for ( int j = boxStartIndex; j < m.GetNumRows(); j++ ) {
 				float s = o_x[boxIndex[j]];
-				if ( lo[j] != -idMath::INFINITY ) {
+				if ( lo[j] != -idMath::INFINITUM ) {
 					lo[j] = - idMath::Fabs( lo[j] * s );
 				}
-				if ( hi[j] != idMath::INFINITY ) {
+				if ( hi[j] != idMath::INFINITUM ) {
 					hi[j] = idMath::Fabs( hi[j] * s );
 				}
 			}
@@ -2747,7 +2747,7 @@ bool idLCP_Symmetric::Solve( const idMatX &o_m, idVecX &o_x, const idVecX &o_b, 
 	// permute input so all unbounded variables come first
 	numUnbounded = 0;
 	for ( int i = 0; i < m.GetNumRows(); i++ ) {
-		if ( lo[i] == -idMath::INFINITY && hi[i] == idMath::INFINITY ) {
+		if ( lo[i] == -idMath::INFINITUM && hi[i] == idMath::INFINITUM ) {
 			if ( numUnbounded != i ) {
 				Swap( numUnbounded, i );
 			}
@@ -2813,10 +2813,10 @@ bool idLCP_Symmetric::Solve( const idMatX &o_m, idVecX &o_x, const idVecX &o_b, 
 			}
 			for ( int j = boxStartIndex; j < m.GetNumRows(); j++ ) {
 				float s = o_x[boxIndex[j]];
-				if ( lo[j] != -idMath::INFINITY ) {
+				if ( lo[j] != -idMath::INFINITUM ) {
 					lo[j] = - idMath::Fabs( lo[j] * s );
 				}
-				if ( hi[j] != idMath::INFINITY ) {
+				if ( hi[j] != idMath::INFINITUM ) {
 					hi[j] = idMath::Fabs( hi[j] * s );
 				}
 			}

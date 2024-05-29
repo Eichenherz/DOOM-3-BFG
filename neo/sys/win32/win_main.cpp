@@ -60,7 +60,7 @@ idCVar Win32Vars_t::win_timerUpdate( "win_timerUpdate", "0", CVAR_SYSTEM | CVAR_
 idCVar Win32Vars_t::win_allowMultipleInstances( "win_allowMultipleInstances", "0", CVAR_SYSTEM | CVAR_BOOL, "allow multiple instances running concurrently" );
 
 idCVar Win32Vars_t::sys_useSteamPath( "sys_useSteamPath", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Look for Steam Doom 3 BFG path instead of local installation" );
-idCVar Win32Vars_t::sys_useGOGPath( "sys_useGOGPath", "0", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Look for GOG Doom 3 BFG path instead of local installation" );
+idCVar Win32Vars_t::sys_useGOGPath( "sys_useGOGPath", "1", CVAR_SYSTEM | CVAR_BOOL | CVAR_ARCHIVE, "Look for GOG Doom 3 BFG path instead of local installation" );
 
 
 Win32Vars_t	win32;
@@ -649,7 +649,7 @@ const char *Sys_DefaultBasePath() {
 	}
 
 	// Try the GOG.com path next
-	basepath = Sys_GogBasePath();
+	basepath = "D://GOG Galaxy//Games//DOOM 3 BFG";//Sys_GogBasePath();
 	if( basepath.Length() && win32.sys_useGOGPath.GetBool() )
 	{
 		testbase = basepath;
@@ -729,8 +729,8 @@ Sys_ListFiles
 */
 int Sys_ListFiles( const char *directory, const char *extension, idStrList &list ) {
 	idStr		search;
-	struct _finddata_t findinfo;
-	int			findhandle;
+	_finddata_t findinfo;
+	intptr_t	findhandle;
 	int			flag;
 
 	if ( !extension) {
@@ -1009,7 +1009,7 @@ Sys_DLL_Load
 */
 intptr_t Sys_DLL_Load( const char *dllName ) {
 	HINSTANCE libHandle = LoadLibrary( dllName );
-	return (int)libHandle;
+	return ( intptr_t )libHandle;
 }
 
 /*
@@ -1017,8 +1017,8 @@ intptr_t Sys_DLL_Load( const char *dllName ) {
 Sys_DLL_GetProcAddress
 =====================
 */
-void *Sys_DLL_GetProcAddress( int dllHandle, const char *procName ) {
-	return GetProcAddress( (HINSTANCE)dllHandle, procName ); 
+void *Sys_DLL_GetProcAddress( intptr_t dllHandle, const char *procName ) {
+	return ( void* ) GetProcAddress( ( HINSTANCE ) dllHandle, procName );
 }
 
 /*
@@ -1026,7 +1026,7 @@ void *Sys_DLL_GetProcAddress( int dllHandle, const char *procName ) {
 Sys_DLL_Unload
 =====================
 */
-void Sys_DLL_Unload( int dllHandle ) {
+void Sys_DLL_Unload( intptr_t dllHandle ) {
 	if ( !dllHandle ) {
 		return;
 	}

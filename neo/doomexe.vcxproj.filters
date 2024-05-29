@@ -537,7 +537,7 @@
     <ClInclude Include="renderer\GLMatrix.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="win_nanoafx.h">
+    <ClInclude Include="sys\win32\win_nanoafx.h">
       <Filter>Sys\Win32</Filter>
     </ClInclude>
   </ItemGroup>

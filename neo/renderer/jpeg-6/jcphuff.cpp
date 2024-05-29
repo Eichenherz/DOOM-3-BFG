@@ -22,7 +22,7 @@
 /* Expanded entropy encoder object for progressive Huffman encoding. */
 
 typedef struct {
-    struct jpeg_entropy_encoder pub;/* public fields */
+    jpeg_entropy_encoder pub;/* public fields */
 
     /* Mode flag: TRUE for optimization, FALSE for actual data output */
     boolean gather_statistics;
@@ -218,7 +218,7 @@ start_pass_phuff( j_compress_ptr cinfo, boolean gather_statistics ) {
 LOCAL void
 dump_buffer( phuff_entropy_ptr entropy ) {
 /* Empty the output buffer; we do not support suspension in this module. */
-    struct jpeg_destination_mgr * dest = entropy->cinfo->dest;
+    jpeg_destination_mgr * dest = entropy->cinfo->dest;
 
     if ( !( *dest->empty_output_buffer )( entropy->cinfo ) ) {
         ERREXIT( entropy->cinfo, JERR_CANT_SUSPEND );
@@ -242,8 +242,8 @@ LOCAL void
 emit_bits( phuff_entropy_ptr entropy, unsigned int code, int size ) {
 /* Emit some bits, unless we are in gather mode */
 /* This routine is heavily used, so it's worth coding tightly. */
-    register INT32 put_buffer = (INT32) code;
-    register int put_bits = entropy->put_bits;
+    INT32 put_buffer = (INT32) code;
+    int put_bits = entropy->put_bits;
 
     /* if size is 0, caller used an invalid Huffman table entry */
     if ( size == 0 ) {
@@ -327,7 +327,7 @@ emit_buffered_bits( phuff_entropy_ptr entropy, char * bufstart,
 
 LOCAL void
 emit_eobrun( phuff_entropy_ptr entropy ) {
-    register int temp, nbits;
+    int temp, nbits;
 
     if ( entropy->EOBRUN > 0 ) {/* if there is any pending EOBRUN */
         temp = entropy->EOBRUN;
@@ -387,8 +387,8 @@ emit_restart( phuff_entropy_ptr entropy, int restart_num ) {
 METHODDEF boolean
 encode_mcu_DC_first( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
     phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
-    register int temp, temp2;
-    register int nbits;
+    int temp, temp2;
+    int nbits;
     int blkn, ci;
     int Al = cinfo->Al;
     JBLOCKROW block;
@@ -471,9 +471,9 @@ encode_mcu_DC_first( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
 METHODDEF boolean
 encode_mcu_AC_first( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
     phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
-    register int temp, temp2;
-    register int nbits;
-    register int r, k;
+    int temp, temp2;
+    int nbits;
+    int r, k;
     int Se = cinfo->Se;
     int Al = cinfo->Al;
     JBLOCKROW block;
@@ -579,7 +579,7 @@ encode_mcu_AC_first( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
 METHODDEF boolean
 encode_mcu_DC_refine( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
     phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
-    register int temp;
+    int temp;
     int blkn;
     int Al = cinfo->Al;
     JBLOCKROW block;
@@ -627,8 +627,8 @@ encode_mcu_DC_refine( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
 METHODDEF boolean
 encode_mcu_AC_refine( j_compress_ptr cinfo, JBLOCKROW * MCU_data ) {
     phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
-    register int temp;
-    register int r, k;
+    int temp;
+    int r, k;
     int EOB;
     char * BR_buffer;
     unsigned int BR;

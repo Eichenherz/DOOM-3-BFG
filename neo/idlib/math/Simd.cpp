@@ -230,8 +230,8 @@ void TestMinMax() {
 
 	bestClocksGeneric = 0;
 	for ( i = 0; i < NUMTESTS; i++ ) {
-		min = idMath::INFINITY;
-		max = -idMath::INFINITY;
+		min = idMath::INFINITUM;
+		max = -idMath::INFINITUM;
 		StartRecordTime( start );
 		p_generic->MinMax( min, max, fsrc0, COUNT );
 		StopRecordTime( end );

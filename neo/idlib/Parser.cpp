@@ -296,7 +296,7 @@ define_t *idParser::DefineFromString( const char *string ) {
 	idParser src;
 	define_t *def;
 
-	if ( !src.LoadMemory(string, strlen(string), "*defineString") ) {
+	if ( !src.LoadMemory(string, (int)strlen(string), "*defineString") ) {
 		return NULL;
 	}
 	// create a define from the source
@@ -2970,7 +2970,7 @@ void idParser::GetStringFromMarker( idStr& out, bool clean ) {
 	
 	// If cleaning then reparse
 	if ( clean ) {	
-		idParser temp( marker_p, strlen( marker_p ), "temp", flags );
+		idParser temp( marker_p, (int)strlen( marker_p ), "temp", flags );
 		idToken token;
 		while ( temp.ReadToken ( &token ) ) {
 			out += token;

@@ -484,7 +484,7 @@ ID_INLINE idStr::idStr( const char *text ) {
 	int l;
 
 	if ( text ) {
-		l = strlen( text );
+		l = (int) strlen( text );
 		EnsureAlloced( l + 1 );
 		strcpy( data, text );
 		len = l;
@@ -494,7 +494,7 @@ ID_INLINE idStr::idStr( const char *text ) {
 ID_INLINE idStr::idStr( const char *text, int start, int end ) {
 	Construct();
 	int i;
-	int l = strlen( text );
+	int l = ( int ) strlen( text );
 
 	if ( end > l ) {
 		end = l;
@@ -756,7 +756,7 @@ ID_INLINE int idStr::Cmpn( const char *text, int n ) const {
 
 ID_INLINE int idStr::CmpPrefix( const char *text ) const {
 	assert( text );
-	return idStr::Cmpn( data, text, strlen( text ) );
+	return idStr::Cmpn( data, text, ( int ) strlen( text ) );
 }
 
 ID_INLINE int idStr::Icmp( const char *text ) const {
@@ -771,7 +771,7 @@ ID_INLINE int idStr::Icmpn( const char *text, int n ) const {
 
 ID_INLINE int idStr::IcmpPrefix( const char *text ) const {
 	assert( text );
-	return idStr::Icmpn( data, text, strlen( text ) );
+	return idStr::Icmpn( data, text, ( int ) strlen( text ) );
 }
 
 ID_INLINE int idStr::IcmpNoColor( const char *text ) const {
@@ -791,7 +791,7 @@ ID_INLINE int idStr::IcmpnPath( const char *text, int n ) const {
 
 ID_INLINE int idStr::IcmpPrefixPath( const char *text ) const {
 	assert( text );
-	return idStr::IcmpnPath( data, text, strlen( text ) );
+	return idStr::IcmpnPath( data, text, ( int ) strlen( text ) );
 }
 
 ID_INLINE int idStr::Length() const {
@@ -851,7 +851,7 @@ ID_INLINE void idStr::Append( const char *text ) {
 	int i;
 
 	if ( text ) {
-		newLen = len + strlen( text );
+		newLen = len + ( int ) strlen( text );
 		EnsureAlloced( newLen + 1 );
 		for ( i = 0; text[ i ]; i++ ) {
 			data[ len + i ] = text[ i ];
@@ -903,7 +903,7 @@ ID_INLINE void idStr::Insert( const char *text, int index ) {
 		index = len;
 	}
 
-	l = strlen( text );
+	l = ( int ) strlen( text );
 	EnsureAlloced( len + l + 1 );
 	for ( i = len; i >= index; i-- ) {
 		data[i+l] = data[i];

@@ -383,7 +383,7 @@ void idAI::Event_FindEnemyAI( int useFOV ) {
 
 	pvs = gameLocal.pvs.SetupCurrentPVS( GetPVSAreas(), GetNumPVSAreas() );
 
-	bestDist = idMath::INFINITY;
+	bestDist = idMath::INFINITUM;
 	bestEnemy = NULL;
 	for ( ent = gameLocal.activeEntities.Next(); ent != NULL; ent = ent->activeNode.Next() ) {
 		if ( ent->fl.hidden || ent->fl.isDormant || !ent->IsType( idActor::Type ) ) {
@@ -483,7 +483,7 @@ void idAI::Event_ClosestReachableEnemyOfEntity( idEntity *team_mate ) {
 	const idVec3 &origin = physicsObj.GetOrigin();
 	areaNum = PointReachableAreaNum( origin );
 
-	bestDistSquared = idMath::INFINITY;
+	bestDistSquared = idMath::INFINITUM;
 	bestEnt = NULL;
 	for( ent = actor->enemyList.Next(); ent != NULL; ent = ent->enemyNode.Next() ) {
 		if ( ent->fl.hidden ) {
@@ -1465,7 +1465,7 @@ void idAI::Event_EnemyRange() {
 		dist = ( enemyEnt->GetPhysics()->GetOrigin() - GetPhysics()->GetOrigin() ).Length();
 	} else {
 		// Just some really high number
-		dist = idMath::INFINITY;
+		dist = idMath::INFINITUM;
 	}
 
 	idThread::ReturnFloat( dist );
@@ -1484,7 +1484,7 @@ void idAI::Event_EnemyRange2D() {
 		dist = ( enemyEnt->GetPhysics()->GetOrigin().ToVec2() - GetPhysics()->GetOrigin().ToVec2() ).Length();
 	} else {
 		// Just some really high number
-		dist = idMath::INFINITY;
+		dist = idMath::INFINITUM;
 	}
 
 	idThread::ReturnFloat( dist );
@@ -2267,7 +2267,7 @@ void idAI::Event_GetClosestHiddenTarget( const char *type ) {
 	}
 
 	bestEnt = NULL;
-	bestTime = idMath::INFINITY;
+	bestTime = idMath::INFINITUM;
 	for( i = 0; i < targets.Num(); i++ ) {
 		ent = targets[ i ].GetEntity();
 		if ( ent != NULL && idStr::Cmp( ent->GetEntityDefName(), type ) == 0 ) {

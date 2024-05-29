@@ -441,8 +441,8 @@ public:
 						// necessary to prevent mutliple gui surfaces, mirrors, autosprites, and some other
 						// special effects from being combined into a single surface
 						// guis, merging sprites or other effects, mirrors and remote views are always discrete
-	bool				IsDiscrete() const { return ( entityGui || gui || deform != DFRM_NONE || sort == SS_SUBVIEW ||
-												( surfaceFlags & SURF_DISCRETE ) != 0 ); }
+	bool				IsDiscrete() const { return ( entityGui || gui || deform != DFRM_NONE || 
+													  sort == (float) SS_SUBVIEW || ( surfaceFlags & SURF_DISCRETE ) != 0 ); }
 
 						// Normally, dmap chops each surface by every BSP boundary, then reoptimizes.
 						// For gigantic polygons like sky boxes, this can cause a huge number of planar

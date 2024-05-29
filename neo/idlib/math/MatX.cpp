@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 //===============================================================
 
 float	idMatX::temp[MATX_MAX_TEMP+4];
-float *	idMatX::tempPtr = (float *) ( ( (int) idMatX::temp + 15 ) & ~15 );
+float *	idMatX::tempPtr = (float *) ( ( (intptr_t) idMatX::temp + 15 ) & ~15 );
 int		idMatX::tempIndex = 0;
 
 
@@ -2465,7 +2465,7 @@ void idMatX::SVD_Solve( idVecX &x, const idVecX &b, const idVecX &w, const idMat
 
 	for ( i = 0; i < numColumns; i++ ) {
 		sum = 0.0f;
-		if ( w[i] >= idMath::FLT_EPSILON ) {
+		if ( w[i] >= idMath::FLOAT_EPSILON ) {
 			for ( j = 0; j < numRows; j++ ) {
 				sum += (*this)[j][i] * b[j];
 			}
@@ -2501,7 +2501,7 @@ void idMatX::SVD_Inverse( idMatX &inv, const idVecX &w, const idMatX &V ) const 
 	// V * [diag(1/w[i])]
 	for ( i = 0; i < numRows; i++ ) {
 		wi = w[i];
-		wi = ( wi < idMath::FLT_EPSILON ) ? 0.0f : 1.0f / wi;
+		wi = ( wi < idMath::FLOAT_EPSILON ) ? 0.0f : 1.0f / wi;
 		for ( j = 0; j < numColumns; j++ ) {
 			V2[j][i] *= wi;
 		}
@@ -2534,7 +2534,7 @@ void idMatX::SVD_MultiplyFactors( idMatX &m, const idVecX &w, const idMatX &V ) 
 
 	for ( r = 0; r < numRows; r++ ) {
 		// calculate row of matrix
-		if ( w[r] >= idMath::FLT_EPSILON ) {
+		if ( w[r] >= idMath::FLOAT_EPSILON ) {
 			for ( i = 0; i < V.GetNumRows(); i++ ) {
 				sum = 0.0f;
 				for ( j = 0; j < numColumns; j++ ) {

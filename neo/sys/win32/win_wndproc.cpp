@@ -146,25 +146,26 @@ main window procedure
 LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 	int key;
 	switch( uMsg ) {
-		case WM_WINDOWPOSCHANGED:
-			if (R_IsInitialized()) {
+		case WM_WINDOWPOSCHANGED: {
+			if( R_IsInitialized() ) {
 				RECT rect;
-				if (::GetClientRect(win32.hWnd, &rect)) {
+				if( ::GetClientRect( win32.hWnd, &rect ) ) {
 
-					if ( rect.right > rect.left && rect.bottom > rect.top ) {
+					if( rect.right > rect.left && rect.bottom > rect.top ) {
 						glConfig.nativeScreenWidth = rect.right - rect.left;
 						glConfig.nativeScreenHeight = rect.bottom - rect.top;
 
 						// save the window size in cvars if we aren't fullscreen
 						int style = GetWindowLong( hWnd, GWL_STYLE );
-						if ( ( style & WS_POPUP ) == 0 ) {
+						if( ( style & WS_POPUP ) == 0 ) {
 							r_windowWidth.SetInteger( glConfig.nativeScreenWidth );
 							r_windowHeight.SetInteger( glConfig.nativeScreenHeight );
 						}
 					}
 				}
 			}
-			break;
+		}
+		break;
 		case WM_MOVE: {
 			int		xPos, yPos;
 			RECT r;
@@ -196,11 +197,6 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 			} else {
 				WIN_EnableAltTab();
 			}
-
-			// do the OpenGL setup
-			void GLW_WM_CREATE( HWND hWnd );
-			GLW_WM_CREATE( hWnd );
-
 			break;
 
 		case WM_DESTROY:
@@ -245,7 +241,12 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
 				// start playing the game sound world
 				soundSystem->SetMute( !win32.activeApp );
-
+				// RBDOOM3 
+				// DG: set com_pause so game pauses when focus is lost
+				// and continues when focus is regained
+				cvarSystem->SetCVarBool( "com_pause", !win32.activeApp );
+				// DG end
+				// 
 				// we do not actually grab or release the mouse here,
 				// that will be done next time through the main loop
 			}
@@ -256,12 +257,12 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 			}
 			break;
 		}
-		case WM_SYSCOMMAND:
+		case WM_SYSCOMMAND: {
 			if ( wParam == SC_SCREENSAVE || wParam == SC_KEYMENU ) {
 				return 0;
 			}
 			break;
-
+		}
 		case WM_SYSKEYDOWN:
 			if ( wParam == 13 ) {	// alt-enter toggles full-screen
 				cvarSystem->SetCVarBool( "r_fullscreen", !renderSystem->IsFullScreen() );
